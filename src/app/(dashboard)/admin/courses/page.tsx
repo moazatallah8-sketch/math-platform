@@ -73,7 +73,7 @@ export default function CoursesPage() {
       title: newCourseTitle,
       grade: newCourseGrade,
       price: 0,
-      status: "مسودة",
+      status: "نشط", // Default to active so it shows up
       students: 0,
       lastUpdated: new Date().toISOString().split('T')[0],
       items: []
@@ -115,6 +115,13 @@ export default function CoursesPage() {
   const openBuilder = (id: number) => {
     setActiveCourseId(id);
     setView('builder');
+  };
+
+  const updateCourseInfo = (field: string, value: any) => {
+    if (!activeCourseId) return;
+    setCourses(courses.map(c => 
+      c.id === activeCourseId ? { ...c, [field]: value } : c
+    ));
   };
 
   // Handlers for Builder View
@@ -362,7 +369,62 @@ export default function CoursesPage() {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-3">
+          {/* Course Basic Info Settings */}
+          <div className="bg-white dark:bg-[#18181b] p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-gray-500 uppercase">اسم الكورس</label>
+              <input 
+                type="text" 
+                value={activeCourse.title}
+                onChange={(e) => updateCourseInfo('title', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-800 rounded-lg bg-gray-50 dark:bg-[#09090b] text-sm focus:ring-2 focus:ring-[#0B5C3B] outline-none"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-gray-500 uppercase">المرحلة الدراسية</label>
+              <select 
+                value={activeCourse.grade}
+                onChange={(e) => updateCourseInfo('grade', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-800 rounded-lg bg-gray-50 dark:bg-[#09090b] text-sm focus:ring-2 focus:ring-[#0B5C3B] outline-none"
+              >
+                <option value="القدرات العامة">القدرات العامة</option>
+                <option value="التحصيلي">التحصيلي</option>
+                <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
+                <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
+                <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
+                <option value="المرحلة المتوسطة">المرحلة المتوسطة</option>
+                <option value="تأسيس عام">تأسيس عام</option>
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-gray-500 uppercase">السعر (ريال)</label>
+              <input 
+                type="number" 
+                value={activeCourse.price}
+                onChange={(e) => updateCourseInfo('price', Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-800 rounded-lg bg-gray-50 dark:bg-[#09090b] text-sm focus:ring-2 focus:ring-[#0B5C3B] outline-none"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-gray-500 uppercase">حالة الكورس (للظهور في الموقع)</label>
+              <select 
+                value={activeCourse.status}
+                onChange={(e) => updateCourseInfo('status', e.target.value)}
+                className={`w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#0B5C3B] ${activeCourse.status === 'نشط' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-gray-50 border-gray-200 text-gray-700'}`}
+              >
+                <option value="نشط">نشط (يظهر للطلاب)</option>
+                <option value="مسودة">مسودة (مخفي)</option>
+                <option value="مؤرشف">مؤرشف</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <LayoutList size={20} className="text-[#0B5C3B]" />
+              محتوى المنهج
+            </h2>
+            <div className="flex flex-wrap items-center gap-3">
             <button 
               onClick={() => handleAddItem('lesson')}
               className="flex items-center gap-2 bg-[#0B5C3B] hover:bg-[#073b26] text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors text-sm"
@@ -384,6 +446,7 @@ export default function CoursesPage() {
               <HelpCircle size={16} />
               إضافة اختبار / واجب
             </button>
+            </div>
           </div>
 
           <div className="space-y-6">
